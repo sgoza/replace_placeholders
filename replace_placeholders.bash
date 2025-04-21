@@ -22,7 +22,7 @@ Mapping file:
 
 Input file:
   Should contain placeholders in the format:
-  <placeholder>key</placeholder>
+  _PLACEHOLDER_key_PLACEHOLDER_
 
 Options:
   -h, --help       Display this help and exit.
@@ -54,14 +54,14 @@ done < "$mapping_file"
 declare -A missing_keys=()
 while IFS= read -r line; do
     tmp="$line"
-    # Match the <placeholder>key</placeholder> pattern.
-    while [[ $tmp =~ \<placeholder\>([A-Za-z0-9_]+)\</placeholder\> ]]; do
+    # Match the _PLACEHOLDER_key_PLACEHOLDER pattern.
+    while [[ $tmp =~ _PLACEHOLDER_([A-Za-z0-9_]+)_PLACEHOLDER_ ]]; do
         key="${BASH_REMATCH[1]}"
         if [[ -z "${map[$key]:-}" ]]; then
             missing_keys["$key"]=1
         fi
         # Remove the processed portion of the line.
-        tmp="${tmp#*<placeholder>"${key}"</placeholder>}"
+        tmp="${tmp#*_PLACEHOLDER_"${key}"_PLACEHOLDER_}"
     done
 done < "$input_file"
 
@@ -81,7 +81,7 @@ trap 'rm -f "$temp_file"' EXIT
 
 while IFS= read -r line; do
     # Match and replace each placeholder.
-    while [[ $line =~ (\<placeholder\>([A-Za-z0-9_]+)\</placeholder\>) ]]; do
+    while [[ $line =~ (_PLACEHOLDER_([A-Za-z0-9_]+)_PLACEHOLDER_) ]]; do
         full="${BASH_REMATCH[1]}"
         key="${BASH_REMATCH[2]}"
         replacement="${map[$key]}"

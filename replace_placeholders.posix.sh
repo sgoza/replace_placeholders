@@ -23,7 +23,7 @@ Mapping file:
 
 Input file:
   Should contain placeholders in the format:
-  <placeholder>key</placeholder>
+  _PLACEHOLDER_key_PLACEHOLDER_
 
 Options:
   -h, --help       Display this help and exit.
@@ -45,8 +45,8 @@ input_file="$2"
 
 # Check for missing keys:
 # Extract all unique keys from the input file.
-keys=$(grep -o '<placeholder>[A-Za-z0-9_]\+</placeholder>' "$input_file" \
-         | sed 's#<placeholder>\(.*\)</placeholder>#\1#' | sort -u)
+keys=$(grep -o '_PLACEHOLDER_[A-Za-z0-9_]\+_PLACEHOLDER_' "$input_file" \
+         | sed 's#_PLACEHOLDER_\(.*\)_PLACEHOLDER_#\1#' | sort -u)
 
 missing=0
 for key in $keys; do
@@ -71,7 +71,7 @@ while IFS='=' read -r key value; do
     # Skip empty lines or lines without a key.
     [ -z "$key" ] && continue
     # Write a sed substitution command. Using | as delimiter.
-    echo "s|<placeholder>${key}</placeholder>|${value}|g" >> "$sed_script"
+    echo "s|_PLACEHOLDER_${key}_PLACEHOLDER_|${value}|g" >> "$sed_script"
 done < "$mapping_file"
 
 # Apply the sed script to the input file, writing output to a temporary file.
